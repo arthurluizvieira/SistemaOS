@@ -4,7 +4,8 @@ from django.db import models
 
 class Visitante(models.Model):
     nome = models.CharField(max_length=100)
-    documento = models.CharField(max_length=50)
+    cpf = models.CharField(max_length=14, blank=True, null=True)
+    rg = models.CharField(max_length=20, blank=True, null=True)
     empresa = models.CharField(max_length=100)
     telefone = models.CharField(max_length=20, blank=True, null=True)
 
