@@ -2,23 +2,27 @@ import { useState } from 'react'
 
 function CadastroVisitanteModal({ onClose, onSalvar }) {
   const [nome, setNome] = useState('')
-  const [documento, setDocumento] = useState('')
+  const [cpf, setCpf] = useState('') // para acionar CPF que adicionamos no backend MODELS
+  const [rg, setRg] = useState('') // para adicionar RG que fiz la no back com CPF
+  // const [documento, setDocumento] = useState('')
   const [empresa, setEmpresa] = useState('')
   const [telefone, setTelefone] = useState('') // para adicionar telefone que fiz lá no backend no models
+
 
   const handleSubmit = (e) => {
     e.preventDefault() // Evita reload da página
 
-    if (!nome.trim() || !documento.trim() || !empresa.trim()) {
+    if (!nome.trim() || !cpf.trim() || !rg.trim() || !empresa.trim()) {
       alert('Preencha todos os campos!')
       return
     }
 
     const novoVisitante = {
       nome,
-      documento,
+      cpf,
+      rg,
       empresa,
-      telefone  // para adicionar telefone que fiz la no backend no models
+      telefone,  // para adicionar telefone que fiz la no backend no models
     }
 
     onSalvar(novoVisitante)
@@ -26,8 +30,10 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
 
     // Limpar os campos
     setNome('')
-    setDocumento('')
+    setCpf('')
+    setRg('')
     setEmpresa('')
+    setTelefone('')
   }
 
   return (
@@ -51,7 +57,7 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
             />
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm text-gray-700 mb-1">Documento</label>
             <input
               type="text"
@@ -61,7 +67,32 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
               required
             />
+          </div> */}
+
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">CPF</label>
+            <input
+              type="text"
+              value={cpf}
+              onChange={e => setCpf(e.target.value)}
+              placeholder="000.000.000-00"
+              className="mt-1 block w-full border rounded-md p-2"
+              required
+            />
           </div>
+
+           <div>
+            <label className="block text-sm text-gray-700 mb-1">RG</label>
+            <input
+              type="text"
+              value={rg}
+              onChange={e => setRg(e.target.value)}
+              placeholder="00.000.000-0"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              required
+            />
+          </div>
+
 
           <div>
             <label className="block text-sm text-gray-700 mb-1">Empresa</label>

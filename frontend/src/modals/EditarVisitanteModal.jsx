@@ -2,14 +2,18 @@ import { useState, useEffect } from 'react'
 
 function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
   const [nome, setNome] = useState('')
-  const [documento, setDocumento] = useState('')
+  const [cpf, setCpf] = useState('')
+  const [rg, setRg] = useState('')
+  // const [documento, setDocumento] = useState('')
   const [empresa, setEmpresa] = useState('')
   const [telefone, setTelefone] = useState('')
   
   useEffect(() => {
     if (visitante) {
       setNome(visitante.nome)
-      setDocumento(visitante.documento)
+      setCpf (visitante.cpf) 
+      setRg (visitante.rg)
+      // setDocumento(visitante.documento)
       setEmpresa(visitante.empresa)
       setTelefone(visitante.telefone || '')
     }
@@ -17,7 +21,7 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!nome.trim() || !documento.trim() || !empresa.trim()) {
+    if (!nome.trim() || !cpf.trim() || !rg.trim() || !empresa.trim()) {
       alert('Preencha todos os campos!')
       return
     }
@@ -25,7 +29,9 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
     onSalvar({
       id: visitante.id,
       nome,
-      documento,
+      cpf,
+      rg,
+      // documento,
       empresa,
       telefone
     })
@@ -54,12 +60,24 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-700 mb-1">Documento</label>
+            <label className="block text-sm text-gray-700 mb-1">CPF</label>
             <input
               type="text"
-              value={documento}
-              onChange={e => setDocumento(e.target.value)}
-              placeholder="RG ou CPF"
+              value={cpf}
+              onChange={e => setCpf(e.target.value)}
+              placeholder="000.000.000-00"
+              className="mt-1 block w-full border rounded-md p-2"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm text-gray-700 mb-1">RG</label>
+            <input
+              type="text"
+              value={rg}
+              onChange={e => setRg(e.target.value)}
+              placeholder="00.000.000-0"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
               required
             />

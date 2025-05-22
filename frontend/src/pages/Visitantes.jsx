@@ -64,10 +64,18 @@ function Visitantes() {
     }
   }
 
+  // const visitantesFiltrados = visitantes.filter(v =>
+  //   v.nome.toLowerCase().includes(busca.toLowerCase()) ||
+  //   v.documento.toLowerCase().includes(busca.toLowerCase())
+  // )
+
   const visitantesFiltrados = visitantes.filter(v =>
-    v.nome.toLowerCase().includes(busca.toLowerCase()) ||
-    v.documento.toLowerCase().includes(busca.toLowerCase())
-  )
+  v.nome.toLowerCase().includes(busca.toLowerCase()) ||
+  (v.cpf && v.cpf.includes(busca)) ||
+  (v.rg && v.rg.includes(busca))
+)
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white py-10 px-4">
@@ -96,8 +104,10 @@ function Visitantes() {
           <table className="w-full table-auto border-collapse">
             <thead className="bg-blue-100 text-blue-800 text-left text-sm uppercase font-semibold">
               <tr>
+                <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Nome</th>
-                <th className="px-4 py-3">Documento</th>
+                <th className="px-4 py-3">CPF</th>
+                <th className="px-4 py-3">RG</th>
                 <th className="px-4 py-3">Empresa</th>
                 <th className="px-4 py-3">Telefone</th>
                 <th className="px-4 py-3">Ações</th>
@@ -106,8 +116,10 @@ function Visitantes() {
             <tbody className="text-gray-700 text-sm">
               {visitantesFiltrados.map(v => (
                 <tr key={v.id} className="border-t hover:bg-blue-50 transition">
+                  <td className='px-4 py-3'>{v.id}</td>
                   <td className="px-4 py-3">{v.nome}</td>
-                  <td className="px-4 py-3">{v.documento}</td>
+                  <td className="px-4 py-3">{v.cpf || '-'}</td>
+                  <td className="px-4 py-3">{v.rg || '-'}</td>
                   <td className="px-4 py-3">{v.empresa}</td>
                   <td className="px-4 py-3">{v.telefone}</td>
                   <td className="px-4 py-3 flex gap-2">
