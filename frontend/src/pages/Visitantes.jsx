@@ -5,6 +5,30 @@ import Swal from 'sweetalert2'
 import CadastroVisitanteModal from '../modals/CadastroVisitanteModal'
 import EditarVisitanteModal from '../modals/EditarVisitanteModal'
 
+
+
+
+function calcularDataRenovacao(dataEntrada) {
+  const entrada = new Date(dataEntrada);
+  entrada.setDate(entrada.getDate() + 30);
+  return entrada.toLocaleDateString('pt-BR'); // formato dd/mm/aaaa
+}
+
+
+function calcularStatus(dataEntrada) {
+  const entrada = new Date(dataEntrada)
+  const hoje = new Date()
+  const diffDias = Math.floor((hoje - entrada) / (1000 * 60 * 60 * 24))
+
+  if (diffDias <= 20) return 'Verificado'
+  if (diffDias <= 25) return 'Atenção'
+  if (diffDias <= 30) return 'Renovar'
+  return 'Pendente'
+}
+
+
+
+
 function Visitantes() {
   const [busca, setBusca] = useState('')
   const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false)
@@ -25,14 +49,39 @@ function Visitantes() {
     }
   }
 
-  const adicionarVisitante = async (novoVisitante) => {
-    try {
-      await axios.post('http://localhost:8000/api/visitantes/', novoVisitante)
-      buscarVisitantes()
-    } catch (error) {
-      console.error('Erro ao adicionar visitante:', error)
+const adicionarVisitante = async (dados) => {
+  try {
+    const response = await fetch('http://localhost:8000/api/visitantes/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(dados),
+    });
+
+    // Se a resposta não for OK (código 400 ou similar)
+    if (!response.ok) {
+      const erro = await response.json();
+
+      // Concatena todas as mensagens de erro
+      const mensagensErro = Object.values(erro)
+        .flat()
+        .join('\n');
+
+      Swal.fire('Erro', mensagensErro || 'Erro ao salvar visitante.', 'error');
+      return false;
     }
+
+    // Se chegou aqui, salvou com sucesso
+    Swal.fire('Sucesso', 'Visitante salvo com sucesso!', 'success');
+    buscarVisitantes(); // recarrega a lista
+    return true;
+  } catch (error) {
+    // Aqui só cai se for realmente erro de conexão
+    Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error');
+    return false;
   }
+}
 
   const atualizarVisitante = async (visitanteAtualizado) => {
     try {
@@ -110,6 +159,8 @@ function Visitantes() {
                 <th className="px-4 py-3">RG</th>
                 <th className="px-4 py-3">Empresa</th>
                 <th className="px-4 py-3">Telefone</th>
+                <th className="px-4 py-3">Renovação</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Ações</th>
               </tr>
             </thead>
@@ -122,7 +173,10 @@ function Visitantes() {
                   <td className="px-4 py-3">{v.rg || '-'}</td>
                   <td className="px-4 py-3">{v.empresa}</td>
                   <td className="px-4 py-3">{v.telefone}</td>
+                  <td className="px-4 py-3">{calcularDataRenovacao(v.entrada)}</td>
+                  <td className="px-4 py-3">{calcularStatus(v.entrada)}</td>
                   <td className="px-4 py-3 flex gap-2">
+
                     <button
                       onClick={() => {
                         setVisitanteSelecionado(v)

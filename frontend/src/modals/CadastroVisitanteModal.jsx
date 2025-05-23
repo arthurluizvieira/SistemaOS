@@ -8,33 +8,73 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
   const [empresa, setEmpresa] = useState('')
   const [telefone, setTelefone] = useState('') // para adicionar telefone que fiz lá no backend no models
 
+  
+  // const handleSubmit = (e) => {
+  //   e.preventDefault() // Evita reload da página
 
-  const handleSubmit = (e) => {
-    e.preventDefault() // Evita reload da página
+  //   if (!nome.trim() ||  !empresa.trim()) {
+  //     alert('Preencha todos os campos!')
+  //     return
+  //   }
 
-    if (!nome.trim() || !cpf.trim() || !rg.trim() || !empresa.trim()) {
-      alert('Preencha todos os campos!')
-      return
-    }
+  //   const novoVisitante = {
+  //     nome,
+  //     cpf,
+  //     rg,
+  //     empresa,
+  //     telefone,  // para adicionar telefone que fiz la no backend no models
+  //   }
 
-    const novoVisitante = {
-      nome,
-      cpf,
-      rg,
-      empresa,
-      telefone,  // para adicionar telefone que fiz la no backend no models
-    }
+  //   onSalvar(novoVisitante)
+  //   onClose()
 
-    onSalvar(novoVisitante)
-    onClose()
+  //   // Limpar os campos dps de salvar
+  //   setNome('')
+  //   setCpf('')
+  //   setRg('')
+  //   setEmpresa('')
+  //   setTelefone('')
+  // }
+  
+const handleSubmit = async (e) => {
+  e.preventDefault()
 
-    // Limpar os campos
-    setNome('')
-    setCpf('')
-    setRg('')
-    setEmpresa('')
-    setTelefone('')
+  if (!nome.trim() || !empresa.trim()) {
+    alert('Preencha todos os campos!')
+    return
   }
+
+  if (!cpf.trim() && !rg.trim()) {
+    alert('Preencha pelo menos CPF ou RG!')
+    return
+  }
+
+  const novoVisitante = {
+    nome,
+    cpf,
+    rg,
+    empresa,
+    telefone,
+  }
+
+  try {
+    const sucesso = await onSalvar(novoVisitante)
+    if (sucesso) {
+      onClose() // só fecha se der certo
+
+      // limpa os campos
+      setNome('')
+      setCpf('')
+      setRg('')
+      setEmpresa('')
+      setTelefone('')
+    }
+  } catch (error) {
+    console.error('Erro ao salvar:', error)
+    alert('Erro ao salvar visitante.')
+  }
+}
+
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -77,7 +117,7 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
               onChange={e => setCpf(e.target.value)}
               placeholder="000.000.000-00"
               className="mt-1 block w-full border rounded-md p-2"
-              required
+              
             />
           </div>
 
@@ -89,7 +129,7 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
               onChange={e => setRg(e.target.value)}
               placeholder="00.000.000-0"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-              required
+              
             />
           </div>
 

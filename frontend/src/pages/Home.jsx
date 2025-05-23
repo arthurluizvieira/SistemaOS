@@ -27,7 +27,7 @@ function Home() {
       title: 'Ordens de Serviço',
       description: 'Gerencie as ordens e atividades.',
       color: 'from-green-600 to-green-500',
-      path: '/home/ordens-servico',
+      path: '/home/ordem_de_servico',
     }
   ]
 

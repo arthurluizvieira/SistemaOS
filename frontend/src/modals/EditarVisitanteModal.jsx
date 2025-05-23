@@ -21,7 +21,7 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!nome.trim() || !cpf.trim() || !rg.trim() || !empresa.trim()) {
+    if (!nome.trim() || !empresa.trim()) {
       alert('Preencha todos os campos!')
       return
     }
@@ -67,7 +67,7 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
               onChange={e => setCpf(e.target.value)}
               placeholder="000.000.000-00"
               className="mt-1 block w-full border rounded-md p-2"
-              required
+              
             />
           </div>
 
@@ -79,7 +79,7 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
               onChange={e => setRg(e.target.value)}
               placeholder="00.000.000-0"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-              required
+              
             />
           </div>
 

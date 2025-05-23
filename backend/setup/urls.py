@@ -28,9 +28,9 @@ urlpatterns = [
     path('api/visitantes/', include('visitantes.urls')),
     path('api/visitas/', include('visitas.urls')),
     path('api/empresas/', include('empresas.urls')),
-    # path('api/ordem_de_servico/', include('ordem_de_servico.urls')),
-    path('ordem_de_servico/<int:pk>/', views.os_detalhe)
-
+    path('api/ordem_de_servico/', include('ordem_de_servico.urls')),
+    path('ordem_de_servico/<int:pk>/', views.os_detalhe),
+    path('auth/', include('auth_user.urls'))
 ]
 
 
