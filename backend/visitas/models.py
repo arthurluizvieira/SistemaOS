@@ -8,5 +8,6 @@ class Visita(models.Model):
     hora_saida = models.TimeField(null=True, blank=True)
     empresa = models.CharField(max_length=100)
 
+
     def __str__(self):
         return f"{self.visitante.nome} - {self.data}"

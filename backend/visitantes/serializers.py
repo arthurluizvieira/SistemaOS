@@ -28,12 +28,12 @@ class VisitanteSerializer(serializers.ModelSerializer):
 
         return data
     
-    # # o campo entrada será preenchido automaticamente com a data de hoje ao criar um novo Visitante
-    # def create(self, validated_data):
-    #     validated_data['entrada'] = date.today()
-    #     return super().create(validated_data)
+    # o campo entrada será preenchido automaticamente com a data de hoje ao criar um novo Visitante
+    def create(self, validated_data):
+        validated_data['entrada'] = date.today()
+        return super().create(validated_data)
 
-    # # quando atualizada também vai renovar a data de entrada , vai servir pique uma "renovação"
-    # def update(self, instance, validated_data):
-    #     validated_data['entrada'] = date.today()
-    #     return super().update(instance, validated_data)
+    # quando atualizada também vai renovar a data de entrada , vai servir pique uma "renovação"
+    def update(self, instance, validated_data):
+        validated_data['entrada'] = date.today()
+        return super().update(instance, validated_data)

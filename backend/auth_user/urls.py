@@ -1,9 +1,6 @@
-from setup.urls import path, include 
-from auth_user import views 
+from django.contrib import admin
+from django.urls import path
 
-#Add Django site authentication urls (for login, logout, password management)
 
 urlpatterns = [
-    path('login/', views.login, name="login")
-
 ]
