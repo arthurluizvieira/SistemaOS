@@ -12,6 +12,9 @@ from rest_framework.decorators import permission_classes
 
 
 # VIEW que vai lidar com essas duas ações : GET (listar) e POST para criar visitantes  
+# As views protegidas do backend foram atualizadas para utilizar o decorador @permission_classes, provenientes
+# do Django rest framework para garantir que somente usuários autenticados (com token JWT válido) consigam
+# acessar essas rotas.
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated]) ## ATUALIZAÇÃO *PARA EXIGIR QUE O USER ESTEJA AUTENTICADO*
 def lista_ou_cria_visitantes(request):
@@ -31,7 +34,9 @@ def lista_ou_cria_visitantes(request):
 
 # View aq lida (edita ou deleta) com um visitante específico (GET, PUT ou DELETE), identificado por pk (ID)
 @api_view(['GET', 'PUT', 'DELETE'])
- ## ATUALIZAÇÃO *PARA EXIGIR IGUAL LÁ ENCIMA, EXIGIR AUTENTICATE*
+#Esse padrão foi aplicado também às outras rotas (POST, PUT, DELETE) da funcionalidade de visitantes,
+#  reforçando a segurança após a implementação do sistema de login com JWT.
+@permission_classes([IsAuthenticated]) ## ATUALIZAÇÃO *PARA EXIGIR IGUAL LÁ ENCIMA, EXIGIR AUTENTICATE*
 def detalhe_visitante(request, pk):
     # aqui tenta buscar o visitante e caso não encontre, não exista, ele retorna o erro 404
     try:

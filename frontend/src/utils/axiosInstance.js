@@ -2,8 +2,9 @@
 import axios from 'axios'
 
 // Criamos uma instância com a URL base da API
+// 🔐 [JWT] Instância global do axios configurada para incluir automaticamente o token JWT nas requisições
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8000/api', // Substitua se for diferente
+  baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json'
   }

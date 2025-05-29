@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+// 🔧 [JWT] Utilizando instância configurada do axios para garantir envio automático do token JWT
 import axios from '../utils/axiosInstance'
 import Swal from 'sweetalert2'
 
@@ -40,6 +41,7 @@ function Visitantes() {
     buscarVisitantes()
   }, [])
 
+  // 🔧 [JWT] Atualizado para usar caminhos relativos compatíveis com a API protegida
   const buscarVisitantes = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/visitantes/')
