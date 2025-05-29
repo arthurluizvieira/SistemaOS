@@ -12,8 +12,8 @@ class VisitanteSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         # recuperar os dados de CPF e RG (caso forem enviados)
-        cpf = data.get('cpf', None)
-        rg = data.get('rg', None)
+        cpf = data.get('cpf')
+        rg = data.get('rg')
         
         # pelo menos um campo entre CPF e RG deve estar preenchido
         if not cpf and not rg:
@@ -37,3 +37,9 @@ class VisitanteSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         validated_data['entrada'] = date.today()
         return super().update(instance, validated_data)
+    
+    # def update(self, instance, validated_data):
+    # # Renova a entrada só se for um parâmetro explícito
+    # if 'renovar' in self.context.get('request').data:
+    #     validated_data['entrada'] = date.today()
+    # return super().update(instance, validated_data)
