@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import axios from '../utils/axiosInstance'
 import CadastroEmpresaModal from '../modals/CadastroEmpresaModal'
+import Swal from 'sweetalert2'
 
 function Empresas() {
   const [empresas, setEmpresas] = useState([])
@@ -22,13 +23,52 @@ function Empresas() {
 
   const adicionarEmpresa = async (novaEmpresa) => {
     try {
-      await axios.post('http://localhost:8000/api/empresas/', novaEmpresa)
+      const response = await axios.post('http://127.0.0.1:8000/api/empresas', novaEmpresa)
+      Swal.fire('Sucesso', 'Empresa registrada com sucesso!', 'sucess')
       buscarEmpresas()
+      return true
     } catch (error) {
-      console.error('Erro ao adicionar empresa:', error)
+      if (error.response?.data) {
+        const mensagensErro = Object.values(error.response.data).flat().join('\n')
+        Swal.fire('Erro', mensagensErro || 'Erro ao cadastrar empresa.', 'error')
+      } else {
+        Swal.fire('Erro', mensagensErro || 'Erro de conexão com o servidor. Tente novamente mais tarde.', 'error')
+      }
+      return false
     }
   }
 
+  const atualizarEmpresa = async (empresaAtualizada) => {
+    try {
+      await axios.put(`http://localhost:8000/api/empresas/${empresaAtualizada.id}/`, empresaAtualizada)
+      buscarEmpresas()
+    } catch (error) {
+      console.error('Erro ao atualizar empresa:', error)
+    }
+  }
+
+  const deletarEmpresa = async (id) => {
+    const confirmacao = await Swal.fire({
+      title: 'Tem certeza?',
+      text: 'Essa ação não pode ser desfeita!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sim, deletar',
+      cancelButtonText: 'Cancelar',
+    })
+
+    if (confirmacao.isConfirmed) {
+      try {
+        await axios.delete(`http://localhost:8000/api/empresas/${id}/`)
+        Swal.fire('Deletado!', 'Empresa removida com sucesso.', 'success')
+        buscarEmpresas()
+      } catch (error) {
+        Swal.fire('Erro', 'Não foi possível deletar a empresa.', 'error')
+      }
+    }
+  }
+
+  
   const empresasFiltradas = empresas.filter((e) =>
     (e.Nome || '').toLowerCase().includes(busca.toLowerCase())
   )

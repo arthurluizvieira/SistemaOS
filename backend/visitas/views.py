@@ -4,7 +4,11 @@ from .models import Visita
 from .serializers import VisitaSerializer
 from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import permission_classes
+
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def lista_ou_cria_visitas(request):
     if request.method == 'GET':
         visitas = Visita.objects.all()
@@ -20,6 +24,7 @@ def lista_ou_cria_visitas(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def detalhe_visita(request, pk):
     try:
         visitante = Visita.objects.get(pk=pk)

@@ -7,6 +7,8 @@ class Visita(models.Model):
     hora_entrada = models.TimeField()
     hora_saida = models.TimeField(null=True, blank=True)
     empresa = models.CharField(max_length=100)
+    ordem_de_servico = models.CharField(max_length=100)
+    
 
 
     def __str__(self):

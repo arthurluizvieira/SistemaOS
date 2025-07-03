@@ -15,16 +15,32 @@ class VisitanteSerializer(serializers.ModelSerializer):
         cpf = data.get('cpf', None)
         rg = data.get('rg', None)
         
-        # pelo menos um campo entre CPF e RG deve estar preenchido
+        # garante que pelo menos um campo entre CPF e RG deve estar preenchido
         if not cpf and not rg:
             raise serializers.ValidationError("Deve ser preenchido algum dos campos entre CPF ou RG.")
 
-    # aqui a biblioteca que nois importou entra em ação, o validate-docbr vai realizar a verificação e ver
-    # se o CPF é válido, se não for vai dar erro, caso seja válido irá return data (retornar dados validados)
+        # aqui a biblioteca que nois importou entra em ação, o validate-docbr vai realizar a verificação e ver
+        # se o CPF é válido, se não for vai dar erro, caso seja válido irá return data (retornar dados validados)
         if cpf:
             validador = CPF()
-            if not validador.validate(cpf):
+            if not validador.validate(cpf): #checa se o CPF segue a estrutura correta (com dígito verificador válido).
                 raise serializers.ValidationError("CPF inválido.")
+        
+            # Verifica se já existe outro visitante com o mesmo CPF
+            duplicado_cpf = Visitante.objects.filter(cpf=cpf)
+            if self.instance:
+                duplicado_cpf = duplicado_cpf.exclude(id=self.instance.id)
+            if duplicado_cpf.exists():
+                raise serializers.ValidationError("Já existe um visitante com este CPF.")  
+
+        # 🔹 Verificação de duplicidade de RG (se informado)
+        if rg:
+            duplicado_rg = Visitante.objects.filter(rg=rg)
+        if self.instance:
+            duplicado_rg = duplicado_rg.exclude(id=self.instance.id)
+        if duplicado_rg.exists():
+            raise serializers.ValidationError("Já existe um visitante com este RG.")  
+
 
         return data
     

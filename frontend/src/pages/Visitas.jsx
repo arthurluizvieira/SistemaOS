@@ -74,7 +74,8 @@ const visitasFiltradas = visitas.filter((v) => {
                 <th className="px-4 py-3">Data</th>
                 <th className="px-4 py-3">Entrada</th>
                 <th className="px-4 py-3">Saída</th>
-                <th className="px-4 py-3">Empresa</th>
+                <th className="px-4 py-3">Empresa</th>          
+                <th className="px-4 py-3">Ordem De Serviço</th>          
               </tr>
             </thead>
             <tbody className="text-gray-700 text-sm">
@@ -85,6 +86,7 @@ const visitasFiltradas = visitas.filter((v) => {
                   <td className="px-4 py-3">{v.hora_entrada}</td>
                   <td className="px-4 py-3">{v.hora_saida || '—'}</td>
                   <td className="px-4 py-3">{v.empresa}</td>
+                  <td className="px-4 py-3">{v.os}</td>
                 </tr>
               ))}
               {visitasFiltradas.length === 0 && (
