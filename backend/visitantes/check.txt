@@ -1,0 +1,2 @@
+Anotando aqui para salvar que o CRUD da tela Visitantes e o Login por meio do token JWT já está configurado
+para logar apenas usuários que foram permitidos/criados por meio do usuário admin do DRF.
