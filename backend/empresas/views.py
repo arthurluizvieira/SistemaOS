@@ -5,10 +5,15 @@ from empresas.models import Empresas
 from empresas.serializers import EmpresasSerializer
 from rest_framework import status
 
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import IsAuthenticated
+
+
 
 # Create your views here.
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def ver_empresas(request):
      if request.method == 'GET':
          empresas = Empresas.objects.all()
@@ -25,6 +30,7 @@ def ver_empresas(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def detalhe_empresa(request, pk):
     try:
         visitante = Empresas.objects.get(pk=pk)
