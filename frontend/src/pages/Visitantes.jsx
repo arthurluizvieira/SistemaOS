@@ -53,37 +53,21 @@ function Visitantes() {
 
 const adicionarVisitante = async (dados) => {
   try {
-    const response = await fetch('http://localhost:8000/api/visitantes/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dados),
-    });
-
-    // Se a resposta não for OK (código 400 ou similar)
-    if (!response.ok) {
-      const erro = await response.json();
-
-      // Concatena todas as mensagens de erro
-      const mensagensErro = Object.values(erro)
-        .flat()
-        .join('\n');
-
-      Swal.fire('Erro', mensagensErro || 'Erro ao salvar visitante.', 'error');
-      return false;
-    }
-
-    // Se chegou aqui, salvou com sucesso
-    Swal.fire('Sucesso', 'Visitante salvo com sucesso!', 'success');
-    buscarVisitantes(); // recarrega a lista
-    return true;
+    const response = await axios.post('/visitantes/', dados) // 🚫 Sem domínio
+    Swal.fire('Sucesso', 'Visitante salvo com sucesso!', 'success')
+    buscarVisitantes()
+    return true
   } catch (error) {
-    // Aqui só cai se for realmente erro de conexão
-    Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error');
-    return false;
+    if (error.response?.data) {
+      const mensagensErro = Object.values(error.response.data).flat().join('\n')
+      Swal.fire('Erro', mensagensErro || 'Erro ao salvar visitante.', 'error')
+    } else {
+      Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error')
+    }
+    return false
   }
 }
+
 
   const atualizarVisitante = async (visitanteAtualizado) => {
     try {
