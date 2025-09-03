@@ -4,10 +4,12 @@ function CadastroEmpresaModal({ onClose, onSalvar }) {
   const [nome, setNome] = useState('')
   const [cnpj, setCnpj] = useState('')
   const [contato, setContato] = useState('')
+  const [endereco, setEndereco] = useState('')
+  const [responsavel, setResponsavel] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    onSalvar({ Nome: nome, cnpj, Contato: contato })
+    onSalvar({ Nome: nome, cnpj, Contato: contato, Endereco: endereco, Responsavel: responsavel })
     onClose()
   }
 
@@ -37,6 +39,22 @@ function CadastroEmpresaModal({ onClose, onSalvar }) {
             placeholder="Contato"
             value={contato}
             onChange={(e) => setContato(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Endereço"
+            value={endereco}
+            onChange={(e) => setEndereco(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Responsável"
+            value={responsavel}
+            onChange={(e) => setResponsavel(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-md"
             required
           />

@@ -31,6 +31,7 @@ urlpatterns = [
     path('visitas/', include('visitas.urls')),
     path('empresas/', include('empresas.urls')),
     path('ordem_de_servico/', include('ordem_de_servico.urls')),
+
     # path('api/visitantes/', include('visitantes.urls')),
     path('api/visitas/', include('visitas.urls')),
     path('api/empresas/', include('empresas.urls')),
@@ -39,6 +40,7 @@ urlpatterns = [
     path('auth/', include('auth_user.urls')),
     path('api/auth', include ('auth_user.urls')),
     path('api/', include(router.urls)),
+
     # JWT endpoints
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh')

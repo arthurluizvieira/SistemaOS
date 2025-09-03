@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+
 // 🔧 [JWT] Utilizando instância configurada do axios para garantir envio automático do token JWT
 import axios from '../utils/axiosInstance'
 import Swal from 'sweetalert2'
@@ -6,15 +7,11 @@ import Swal from 'sweetalert2'
 import CadastroVisitanteModal from '../modals/CadastroVisitanteModal'
 import EditarVisitanteModal from '../modals/EditarVisitanteModal'
 
-
-
-
 function calcularDataRenovacao(dataEntrada) {
   const entrada = new Date(dataEntrada);
   entrada.setDate(entrada.getDate() + 30);
   return entrada.toLocaleDateString('pt-BR'); // formato dd/mm/aaaa
 }
-
 
 function calcularStatus(dataEntrada) {
   const entrada = new Date(dataEntrada)
@@ -27,9 +24,6 @@ function calcularStatus(dataEntrada) {
   return 'Pendente'
 }
 
-
-
-
 function Visitantes() {
   const [busca, setBusca] = useState('')
   const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false)
@@ -38,6 +32,7 @@ function Visitantes() {
   const [visitanteSelecionado, setVisitanteSelecionado] = useState(null)
 
   useEffect(() => {
+    // Carrega Lista ao iniciar o componente
     buscarVisitantes()
   }, [])
 
@@ -51,39 +46,23 @@ function Visitantes() {
     }
   }
 
-const adicionarVisitante = async (dados) => {
-  try {
-    const response = await fetch('http://localhost:8000/api/visitantes/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(dados),
-    });
-
-    // Se a resposta não for OK (código 400 ou similar)
-    if (!response.ok) {
-      const erro = await response.json();
-
-      // Concatena todas as mensagens de erro
-      const mensagensErro = Object.values(erro)
-        .flat()
-        .join('\n');
-
-      Swal.fire('Erro', mensagensErro || 'Erro ao salvar visitante.', 'error');
-      return false;
+  
+  const adicionarVisitante = async (dados) => {
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/visitantes/', dados)
+      Swal.fire('Sucesso', 'Visitante salvo com sucesso!', 'success')
+      buscarVisitantes()
+      return true
+    } catch (error) {
+      if (error.response?.data) {
+        const mensagensErro = Object.values(error.response.data).flat().join('\n')
+        Swal.fire('Erro', mensagensErro || 'Erro ao salvar visitante.', 'error')
+      } else {
+        Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error')
+      }
+      return false
     }
-
-    // Se chegou aqui, salvou com sucesso
-    Swal.fire('Sucesso', 'Visitante salvo com sucesso!', 'success');
-    buscarVisitantes(); // recarrega a lista
-    return true;
-  } catch (error) {
-    // Aqui só cai se for realmente erro de conexão
-    Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error');
-    return false;
-  }
-}
+  } // <-- ❌ AQUI ESTAVA O ERRO: esta chave fechava a função Visitantes, o que causava o 'return' fora da função
 
   const atualizarVisitante = async (visitanteAtualizado) => {
     try {
@@ -115,18 +94,11 @@ const adicionarVisitante = async (dados) => {
     }
   }
 
-  // const visitantesFiltrados = visitantes.filter(v =>
-  //   v.nome.toLowerCase().includes(busca.toLowerCase()) ||
-  //   v.documento.toLowerCase().includes(busca.toLowerCase())
-  // )
-
   const visitantesFiltrados = visitantes.filter(v =>
-  v.nome.toLowerCase().includes(busca.toLowerCase()) ||
-  (v.cpf && v.cpf.includes(busca)) ||
-  (v.rg && v.rg.includes(busca))
-)
-
-
+    v.nome.toLowerCase().includes(busca.toLowerCase()) ||
+    (v.cpf && v.cpf.includes(busca)) ||
+    (v.rg && v.rg.includes(busca))
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white py-10 px-4">
@@ -169,7 +141,7 @@ const adicionarVisitante = async (dados) => {
             <tbody className="text-gray-700 text-sm">
               {visitantesFiltrados.map(v => (
                 <tr key={v.id} className="border-t hover:bg-blue-50 transition">
-                  <td className='px-4 py-3'>{v.id}</td>
+                  <td className="px-4 py-3">{v.id}</td>
                   <td className="px-4 py-3">{v.nome}</td>
                   <td className="px-4 py-3">{v.cpf || '-'}</td>
                   <td className="px-4 py-3">{v.rg || '-'}</td>
@@ -178,7 +150,6 @@ const adicionarVisitante = async (dados) => {
                   <td className="px-4 py-3">{calcularDataRenovacao(v.entrada)}</td>
                   <td className="px-4 py-3">{calcularStatus(v.entrada)}</td>
                   <td className="px-4 py-3 flex gap-2">
-
                     <button
                       onClick={() => {
                         setVisitanteSelecionado(v)
@@ -201,7 +172,8 @@ const adicionarVisitante = async (dados) => {
               ))}
               {visitantesFiltrados.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="text-center px-4 py-6 text-gray-500">
+                  {/*estava colspan = 4 */}
+                  <td colSpan="9" className="text-center px-4 py-6 text-gray-500">
                     Nenhum visitante encontrado.
                   </td>
                 </tr>
@@ -233,5 +205,3 @@ const adicionarVisitante = async (dados) => {
 }
 
 export default Visitantes
-
-
