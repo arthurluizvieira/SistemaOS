@@ -1,15 +1,23 @@
 from django.db import models
 from visitantes.models import Visitante
+from empresas.models import Empresas
+from django.contrib.auth.models import User
+
+
+from django.db import models
+from django.contrib.auth.models import User
 
 class Visita(models.Model):
-    visitante = models.ForeignKey(Visitante, on_delete=models.CASCADE, related_name='visitas')
+    id_visitante = models.ForeignKey('visitantes.Visitante', on_delete=models.CASCADE)
+    id_empresa = models.ForeignKey('empresas.Empresas', on_delete=models.CASCADE)
+
     data = models.DateField()
     hora_entrada = models.TimeField()
     hora_saida = models.TimeField(null=True, blank=True)
-    empresa = models.CharField(max_length=100)
-    ordem_de_servico = models.CharField(max_length=100)
-    
 
+    numero_os = models.CharField(max_length=50)
+
+    fk_usuario_id_usuario = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.visitante.nome} - {self.data}"
+        return f"Visita {self.id}"

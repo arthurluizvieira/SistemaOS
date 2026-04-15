@@ -19,7 +19,21 @@ function Login() {
       const token = response.data.access
       localStorage.setItem('token', token)
 
-      Swal.fire('Login realizado!', 'Bem-vindo!', 'success')
+      // Swal.fire('Login realizado!', 'Bem-vindo!', 'success') - erros do botao invisivel e pq nesse
+      // padrao herda estilo q entra em conflito com tailiwind ou o css que deixa invisivel, com o 
+      // custom class voce deixa estilo explicito para o botao do jeito q eu bem entender .
+
+      Swal.fire({
+        title: 'Login realizado!',
+        text: 'Bem-vindo!',
+        icon: 'success',
+        confirmButtonText: 'OK',
+        customClass: {
+          confirmButton: 'bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700'
+        },
+        buttonsStyling: false
+      })
+
       navigate('/home')
     } catch (error) {
       Swal.fire('Erro', 'Usuário ou senha inválidos.', 'error')

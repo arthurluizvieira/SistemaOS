@@ -25,7 +25,10 @@ function EditarVisitanteModal({ visitante, onClose, onSalvar }) {
       alert('Preencha todos os campos!')
       return
     }
-
+    if (!cpf.trim() || !rg.trim()) {
+      alert('Preencha CPF e RG!')
+      return
+    }
     onSalvar({
       id: visitante.id,
       nome,

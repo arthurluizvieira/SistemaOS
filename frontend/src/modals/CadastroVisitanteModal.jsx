@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Swal from 'sweetalert2'
 
 function CadastroVisitanteModal({ onClose, onSalvar }) {
   const [nome, setNome] = useState('')
@@ -44,8 +45,8 @@ const handleSubmit = async (e) => {
     return
   }
 
-  if (!cpf.trim() && !rg.trim()) {
-    alert('Preencha pelo menos CPF ou RG!')
+  if (!cpf.trim() || !rg.trim()) {
+    alert('Preencha CPF e RG!')
     return
   }
 
@@ -60,6 +61,19 @@ const handleSubmit = async (e) => {
   try {
     const sucesso = await onSalvar(novoVisitante)
     if (sucesso) {
+
+      Swal.fire({
+        title: "Sucesso!",
+        text: "Visitante cadastrado com sucesso.",
+        icon: "success",
+        confirmButtonText: "OK",
+        customClass: {
+          confirmButton: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        },
+        buttonsStyling: false,
+      })
+
+
       onClose() // só fecha se der certo
 
       // limpa os campos
@@ -159,6 +173,7 @@ const handleSubmit = async (e) => {
               required
             />
         </div>  
+
 
         <div className="flex justify-end gap-2 pt-4">
           <button

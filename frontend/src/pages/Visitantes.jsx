@@ -81,13 +81,30 @@ function Visitantes() {
       showCancelButton: true,
       confirmButtonText: 'Sim, deletar',
       cancelButtonText: 'Cancelar',
+      iconColor: 'red',
+      customClass: {
+        confirmButton: "bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600",
+        cancelButton: "bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600"
+      },
+      buttonsStyling: false
     })
 
     if (confirmacao.isConfirmed) {
       try {
         await axios.delete(`http://localhost:8000/api/visitantes/${id}/`)
-        Swal.fire('Deletado!', 'Visitante removido com sucesso.', 'success')
-        buscarVisitantes()
+
+        setVisitantes(prev => prev.filter(v => v.id !== id))
+
+        Swal.fire({
+          title: "Deletado!",
+          text: "Visitante removido com sucesso.",
+          icon: "success",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          },
+          buttonsStyling: false,
+        })
       } catch (error) {
         Swal.fire('Erro', 'Não foi possível deletar o visitante.', 'error')
       }

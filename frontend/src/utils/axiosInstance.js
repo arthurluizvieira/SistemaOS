@@ -10,12 +10,12 @@ const axiosInstance = axios.create({
   }
 })
 
-// Adicionamos um interceptor para incluir o token em cada requisição
+// Adicionei um interceptor para incluir o token em cada requisição
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token') // Pegamos o token armazenado
+    const token = localStorage.getItem('token') // pega o token armazenado
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}` // Adicionamos o token no header
+      config.headers['Authorization'] = `Bearer ${token}` // adiciona o token no header
     }
     return config
   },
