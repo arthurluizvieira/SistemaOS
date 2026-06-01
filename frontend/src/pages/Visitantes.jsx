@@ -29,11 +29,13 @@ function Visitantes() {
   const [mostrarModalCadastro, setMostrarModalCadastro] = useState(false)
   const [mostrarModalEdicao, setMostrarModalEdicao] = useState(false)
   const [visitantes, setVisitantes] = useState([])
+  const [empresas, setEmpresas] = useState([]) // Estado para guardar as empresas cadastradas
   const [visitanteSelecionado, setVisitanteSelecionado] = useState(null)
 
   useEffect(() => {
     // Carrega Lista ao iniciar o componente
     buscarVisitantes()
+    buscarEmpresas() // Carrega as empresas para poder traduzir os IDs antigos
   }, [])
 
   // 🔧 [JWT] Atualizado para usar caminhos relativos compatíveis com a API protegida
@@ -46,6 +48,15 @@ function Visitantes() {
     }
   }
 
+  // Busca as empresas para formatar a tabela corretamente
+  const buscarEmpresas = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/empresas/')
+      setEmpresas(response.data)
+    } catch (error) {
+      console.error('Erro ao buscar empresas:', error)
+    }
+  }
   
   const adicionarVisitante = async (dados) => {
     try {
@@ -111,15 +122,38 @@ function Visitantes() {
     }
   }
 
+  // Função que corrige os dados da tabela, traduzindo o ID antigo para "ID - Nome"
+  const formatarEmpresa = (valorEmpresa) => {
+    if (!valorEmpresa) return '-'
+    
+    // Se a string já tiver " - " (formato novo), retorna ela mesma
+    if (String(valorEmpresa).includes(' - ')) {
+      return valorEmpresa
+    }
+
+    // Se for só o ID (formato antigo), busca a empresa e monta o nome bonitão
+    const emp = empresas.find(e => e.id === Number(valorEmpresa))
+    if (emp) {
+      return `${emp.id} - ${emp.Nome || emp.nome}`
+    }
+
+    return valorEmpresa
+  }
+
   const visitantesFiltrados = visitantes.filter(v =>
     v.nome.toLowerCase().includes(busca.toLowerCase()) ||
     (v.cpf && v.cpf.includes(busca)) ||
     (v.rg && v.rg.includes(busca))
   )
-
+  // aqui nois chama o "Liderança" dessa Tela -> todo estilo e layout que tiver nessas "Ordens" -> vai aplicar para tudo
   return (
+    // O Liderança que aplica TODO essa estilização de gradiente suave + espaçamento p um visual + leve moderno e rapido
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white py-10 px-4">
-      <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl p-8 space-y-8">
+      
+      {/* conteúdo principal - TODO CONTEUDO PRINCIPAL -->> MAIN */}
+      <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl p-4 space-y-4">
+        
+        {/* "só a cabeça" */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 className="text-3xl font-bold text-blue-700">Visitantes</h2>
           <button
@@ -129,7 +163,10 @@ function Visitantes() {
             + Cadastrar novo visitante
           </button>
         </div>
+        {/* final da cabeça" */}
 
+
+        {/* campo de busca aq, o Input */}
         <div>
           <input
             type="text"
@@ -139,7 +176,9 @@ function Visitantes() {
             className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
           />
         </div>
+        {/* final do INput (campo de busca) */}
 
+        {/* tabela dos visitantes cadastrados */}
         <div className="overflow-x-auto">
           <table className="w-full table-auto border-collapse">
             <thead className="bg-blue-100 text-blue-800 text-left text-sm uppercase font-semibold">
@@ -155,6 +194,8 @@ function Visitantes() {
                 <th className="px-4 py-3">Ações</th>
               </tr>
             </thead>
+
+            {/* corpo da tabela */}
             <tbody className="text-gray-700 text-sm">
               {visitantesFiltrados.map(v => (
                 <tr key={v.id} className="border-t hover:bg-blue-50 transition">
@@ -162,10 +203,13 @@ function Visitantes() {
                   <td className="px-4 py-3">{v.nome}</td>
                   <td className="px-4 py-3">{v.cpf || '-'}</td>
                   <td className="px-4 py-3">{v.rg || '-'}</td>
-                  <td className="px-4 py-3">{v.empresa}</td>
+                  {/* Aplicação da correção de layout da empresa */}
+                  <td className="px-4 py-3 font-medium">{formatarEmpresa(v.empresa)}</td>
                   <td className="px-4 py-3">{v.telefone}</td>
                   <td className="px-4 py-3">{calcularDataRenovacao(v.entrada)}</td>
                   <td className="px-4 py-3">{calcularStatus(v.entrada)}</td>
+                  
+                  {/* Ações - os dois botões do campo "Ações" (Editar/Deletar) */}
                   <td className="px-4 py-3 flex gap-2">
                     <button
                       onClick={() => {
@@ -195,18 +239,25 @@ function Visitantes() {
                   </td>
                 </tr>
               )}
+              
             </tbody>
           </table>
         </div>
+        {/* fecha div da lista dos visitantes cadastrados  */}
       </div>
+      {/* fecha div da tabela com O Conteudo principal */}      
 
+
+      {/* modal de cadastro */}
       {mostrarModalCadastro && (
         <CadastroVisitanteModal
           onClose={() => setMostrarModalCadastro(false)}
           onSalvar={adicionarVisitante}
         />
       )}
+      {/* final modal de cadastro */}
 
+      {/* modal de edicao */}
       {mostrarModalEdicao && visitanteSelecionado && (
         <EditarVisitanteModal
           visitante={visitanteSelecionado}
@@ -217,7 +268,17 @@ function Visitantes() {
           onSalvar={atualizarVisitante}
         />
       )}
+      {/* final modal de edicao */}
+
+      {/* rodapé interno */}
+      <footer className="pb-2 mt-20 text-center text-orange-600 text-sm">
+        <p>© TI - Qmovi Indústria Moveleira LTDA - Gestão de OS - 2026</p>
+          {/* <p className="mt-1 italic text-blue-600 font-extralight" >github.com/arthurluizvieira</p> */}
+      </footer>              
+      {/* final rodape */}     
+
     </div>
+    // AQUI FECHA O "LIDERANÇA" -->> todo tailwind e estilização da Tela Visitantes.
   )
 }
 

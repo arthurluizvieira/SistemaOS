@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
+import axios from '../utils/axiosInstance'
 
 function CadastroVisitanteModal({ onClose, onSalvar }) {
   const [nome, setNome] = useState('')
@@ -9,6 +10,20 @@ function CadastroVisitanteModal({ onClose, onSalvar }) {
   const [empresa, setEmpresa] = useState('')
   const [telefone, setTelefone] = useState('') // para adicionar telefone que fiz lá no backend no models
 
+  const [listaEmpresas, setListaEmpresas] = useState([])
+
+  // Busca as empresas cadastradas no banco assim que o modal abre
+  useEffect(() => {
+    const buscarEmpresas = async () => {
+      try {
+        const res = await axios.get('http://localhost:8000/api/empresas/')
+        setListaEmpresas(res.data)
+      } catch (error) {
+        console.error("Erro ao carregar empresas no modal", error)
+      }
+    }
+    buscarEmpresas()
+  }, [])
   
   // const handleSubmit = (e) => {
   //   e.preventDefault() // Evita reload da página
@@ -73,7 +88,6 @@ const handleSubmit = async (e) => {
         buttonsStyling: false,
       })
 
-
       onClose() // só fecha se der certo
 
       // limpa os campos
@@ -88,7 +102,6 @@ const handleSubmit = async (e) => {
     alert('Erro ao salvar visitante.')
   }
 }
-
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -147,17 +160,22 @@ const handleSubmit = async (e) => {
             />
           </div>
 
-
           <div>
             <label className="block text-sm text-gray-700 mb-1">Empresa</label>
-            <input
-              type="text"
+            <select
               value={empresa}
               onChange={e => setEmpresa(e.target.value)}
-              placeholder="Empresa vinculada"
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
               required
-            />
+            >
+              <option value="">Selecione uma empresa...</option>
+              {listaEmpresas.map(emp => (
+                // Alterado o value para enviar "ID - Nome da Empresa" para o backend texto
+                <option key={emp.id} value={`${emp.id} - ${emp.Nome || emp.nome}`}>
+                  {emp.id} - {emp.Nome || emp.nome}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

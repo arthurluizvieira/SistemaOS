@@ -8,3 +8,4 @@ class VisitaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Visita
         fields = '__all__'
+        read_only_fields = ['fk_usuario_id_usuario']

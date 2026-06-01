@@ -7,6 +7,7 @@ function Empresas() {
   const [empresas, setEmpresas] = useState([])
   const [busca, setBusca] = useState('')
   const [mostrarModal, setMostrarModal] = useState(false)
+  const [empresaEditando, setEmpresaEditando] = useState(null)
 
   useEffect(() => {
     buscarEmpresas()
@@ -23,16 +24,17 @@ function Empresas() {
 
   const adicionarEmpresa = async (novaEmpresa) => {
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/empresas', novaEmpresa)
-      Swal.fire('Sucesso', 'Empresa registrada com sucesso!', 'sucess')
+      await axios.post('http://localhost:8000/api/empresas/', novaEmpresa)
+      Swal.fire('Sucesso', 'Empresa registrada com sucesso!', 'success') 
       buscarEmpresas()
+      setMostrarModal(false)
       return true
     } catch (error) {
       if (error.response?.data) {
         const mensagensErro = Object.values(error.response.data).flat().join('\n')
         Swal.fire('Erro', mensagensErro || 'Erro ao cadastrar empresa.', 'error')
       } else {
-        Swal.fire('Erro', mensagensErro || 'Erro de conexão com o servidor. Tente novamente mais tarde.', 'error')
+        Swal.fire('Erro', 'Erro de conexão com o servidor.', 'error')
       }
       return false
     }
@@ -41,9 +43,12 @@ function Empresas() {
   const atualizarEmpresa = async (empresaAtualizada) => {
     try {
       await axios.put(`http://localhost:8000/api/empresas/${empresaAtualizada.id}/`, empresaAtualizada)
+      Swal.fire('Sucesso', 'Empresa atualizada com sucesso!', 'success')
       buscarEmpresas()
+      setMostrarModal(false)
     } catch (error) {
       console.error('Erro ao atualizar empresa:', error)
+      Swal.fire('Erro', 'Não foi possível atualizar a empresa.', 'error')
     }
   }
 
@@ -68,18 +73,17 @@ function Empresas() {
     }
   }
 
-  
   const empresasFiltradas = empresas.filter((e) =>
-    (e.Nome || '').toLowerCase().includes(busca.toLowerCase())
+    (e.Nome || e.nome || '').toLowerCase().includes(busca.toLowerCase())
   )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white py-10 px-4">
-      <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl p-8 space-y-8">
+      <div className="max-w-7xl mx-auto bg-white shadow-2xl rounded-2xl p-4 space-y-4">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 className="text-3xl font-bold text-blue-700">Empresas</h2>
           <button
-            onClick={() => setMostrarModal(true)}
+            onClick={() => { setEmpresaEditando(null); setMostrarModal(true); }}
             className="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors"
           >
             + Cadastrar nova empresa
@@ -100,37 +104,68 @@ function Empresas() {
           <table className="w-full table-auto border-collapse">
             <thead className="bg-blue-100 text-blue-800 text-left text-sm uppercase font-semibold">
               <tr>
+                <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">Nome</th>
                 <th className="px-4 py-3">CNPJ</th>
                 <th className="px-4 py-3">Contato</th>
+                <th className="px-4 py-3">Endereço</th>
+                <th className="px-4 py-3">Responsável</th>
+                <th className="px-4 py-3 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="text-gray-700 text-sm">
               {empresasFiltradas.map((e) => (
                 <tr key={e.id} className="border-t hover:bg-blue-50 transition">
-                  <td className="px-4 py-3">{e.Nome}</td>
+                  <td className="px-4 py-3 font-bold">{e.id}</td>
+                  {/* Renderiza qualquer variação de maiúscula ou minúscula que vier da API */}
+                  <td className="px-4 py-3 font-medium">{e.Nome || e.nome}</td>
                   <td className="px-4 py-3">{e.cnpj}</td>
-                  <td className="px-4 py-3">{e.Contato}</td>
+                  <td className="px-4 py-3">{e.Contato || e.contato}</td>
+                  <td className="px-4 py-3">{e.Endereco || e.endereco}</td>
+                  <td className="px-4 py-3">{e.Responsavel || e.responsavel}</td>
+                  <td className="px-4 py-3 flex gap-2 justify-center">
+                    <button
+                      onClick={() => { setEmpresaEditando(e); setMostrarModal(true); }}
+                      className="bg-yellow-400 px-3 py-1 rounded text-white text-xs font-bold hover:bg-yellow-500"
+                    >
+                      Editar
+                    </button>
+                    <button
+                      onClick={() => deletarEmpresa(e.id)}
+                      className="bg-red-500 px-3 py-1 rounded text-white text-xs font-bold hover:bg-red-600"
+                    >
+                      Deletar
+                    </button>
+                  </td>
                 </tr>
               ))}
               {empresasFiltradas.length === 0 && (
                 <tr>
-                  <td colSpan="3" className="text-center px-4 py-6 text-gray-500">
+                  <td colSpan="7" className="text-center px-4 py-6 text-gray-500">
                     Nenhuma empresa encontrada.
                   </td>
                 </tr>
               )}
             </tbody>
-          </table>
+          </table>         
         </div>
       </div>
 
       {mostrarModal && (
         <CadastroEmpresaModal
           onClose={() => setMostrarModal(false)}
-          onSalvar={adicionarEmpresa}
+          onSalvar={empresaEditando ? atualizarEmpresa : adicionarEmpresa}
+          empresaEditando={empresaEditando}
         />
       )}
+
+      {/* rodapé interno */}
+      <footer className="mt-20 text-center text-orange-600 text-sm">
+        <p >© TI - Qmovi Indústria Moveleira LTDA - Gestão de OS - 2026</p>
+          {/* <p className="mt-1 italic text-blue-600 font-extralight" >github.com/arthurluizvieira</p> */}
+      </footer>              
+      {/* final rodape */}      
+
     </div>
   )
 }

@@ -122,6 +122,7 @@
 // mais recente atualizado
 import { useState, useEffect } from 'react'
 import axios from '../utils/axiosInstance'
+import Swal from 'sweetalert2'
 
 function CadastroVisitaModal({ onClose, onSalvar }) {
   const [visitante, setVisitante] = useState('')
@@ -158,51 +159,42 @@ function CadastroVisitaModal({ onClose, onSalvar }) {
   }
 
   const handleSubmit = async (e) => {
-  e.preventDefault()
+    e.preventDefault()
 
-  const visitanteObj = visitantes.find(v => v.nome === visitante)
-  const empresaObj = empresas.find(e => e.nome === empresa)
-
-  console.log('visitante:', visitante)
-  console.log('empresa:', empresa)
-  console.log('data:', data)
-  console.log('horaEntrada:', horaEntrada)
-  console.log('horaSaida:', horaSaida)
-  console.log('numeroOS:', numeroOS)
-  if (!visitante || !empresa || !data || !horaEntrada) {
-    alert('Preencha corretamente os campos!')
-    return
-  }
-
-  const novaVisita = {
-    id_visitante: visitante,
-    id_empresa: empresa,
-    data: data,
-    hora_entrada: horaEntrada,
-    hora_saida: horaSaida,
-    numero_os: numeroOS
-}
-
-  console.log("ENVIANDO:", novaVisita) // 👈 DEBUG
-
-  try {
-    const sucesso = await onSalvar(novaVisita)
-
-    if (sucesso) {
-      onClose()
-
-      setVisitante('')
-      setEmpresa('')
-      setData('')
-      setHoraEntrada('')
-      setHoraSaida('')
-      setNumeroOS('')
+    if (!visitante || !empresa || !data || !horaEntrada) {
+      Swal.fire('Atenção', 'Preencha todos os campos obrigatórios!', 'warning')
+      return
     }
-  } catch (error) {
-    console.error('Erro ao salvar visita:', error.response?.data) // 👈 AQUI VEM O ERRO REAL
-    alert('Erro ao salvar visita')
+
+    const novaVisita = {
+      id_visitante: visitante,
+      id_empresa: empresa,
+      data: data,
+      hora_entrada: horaEntrada,
+      hora_saida: horaSaida || null,
+      numero_os: numeroOS
+    }
+
+    try {
+      const sucesso = await onSalvar(novaVisita)
+      if (sucesso) {
+        Swal.fire({
+          title: "Sucesso!",
+          text: "Visita registrada com sucesso.",
+          icon: "success",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          },
+          buttonsStyling: false,
+        })
+        onClose()
+      }
+    } catch (error) {
+      console.error('Erro ao salvar visita:', error.response?.data)
+      Swal.fire('Erro', 'Erro ao salvar visita.', 'error')
+    }
   }
-}
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -210,19 +202,15 @@ function CadastroVisitaModal({ onClose, onSalvar }) {
         onSubmit={handleSubmit}
         className="bg-white rounded-lg shadow-2xl w-full max-w-md p-6 space-y-6"
       >
-        <h2 className="text-xl font-bold text-blue-700 text-center">
-          Cadastrar Visita
-        </h2>
+        <h2 className="text-xl font-bold text-blue-700 text-center">Cadastrar Visita</h2>
 
         <div className="space-y-4">
-
-          {/* VISITANTE */}
           <div>
             <label className="block text-sm text-gray-700 mb-1">Visitante</label>
             <select
               value={visitante}
-              onChange={e => setVisitante(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              onChange={e => setVisitante(Number(e.target.value))}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
               required
             >
               <option value="">Selecione um visitante</option>
@@ -234,58 +222,54 @@ function CadastroVisitaModal({ onClose, onSalvar }) {
             </select>
           </div>
 
-          {/* EMPRESA */}
           <div>
             <label className="block text-sm text-gray-700 mb-1">Empresa</label>
             <select
               value={empresa}
               onChange={e => setEmpresa(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
               required
             >
               <option value="">Selecione uma empresa</option>
               {empresas.map(e => (
-                <option key={e.id} value={e.id}>
-                  {e.nome || e.Nome}
-                </option>
+                <option key={e.id} value={e.id}>{e.nome || e.Nome}</option>
               ))}
             </select>
           </div>
 
-          {/* DATA */}
           <div>
             <label className="block text-sm text-gray-700 mb-1">Data</label>
             <input
               type="date"
               value={data}
               onChange={e => setData(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              required
             />
           </div>
 
-          {/* HORA ENTRADA */}
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">Hora Entrada</label>
-            <input
-              type="time"
-              value={horaEntrada}
-              onChange={e => setHoraEntrada(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
+          <div className="flex gap-4">
+            <div className="w-1/2">
+              <label className="block text-sm text-gray-700 mb-1">Hora Entrada</label>
+              <input
+                type="time"
+                value={horaEntrada}
+                onChange={e => setHoraEntrada(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+                required
+              />
+            </div>
+            <div className="w-1/2">
+              <label className="block text-sm text-gray-700 mb-1">Hora Saída</label>
+              <input
+                type="time"
+                value={horaSaida}
+                onChange={e => setHoraSaida(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              />
+            </div>
           </div>
 
-          {/* HORA SAÍDA */}
-          <div>
-            <label className="block text-sm text-gray-700 mb-1">Hora Saída</label>
-            <input
-              type="time"
-              value={horaSaida}
-              onChange={e => setHoraSaida(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-
-          {/* OS */}
           <div>
             <label className="block text-sm text-gray-700 mb-1">Número OS</label>
             <input
@@ -293,7 +277,8 @@ function CadastroVisitaModal({ onClose, onSalvar }) {
               value={numeroOS}
               onChange={e => setNumeroOS(e.target.value)}
               placeholder="Ordem de serviço"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
+              required
             />
           </div>
         </div>
@@ -302,11 +287,10 @@ function CadastroVisitaModal({ onClose, onSalvar }) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 text-sm"
+            className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 text-sm font-medium"
           >
             Cancelar
           </button>
-
           <button
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm font-semibold"

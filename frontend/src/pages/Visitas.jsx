@@ -134,19 +134,37 @@ function Visitas() {
   }, [])
 
   const buscarVisitas = async () => {
-    const res = await axios.get('/visitas/')
-    setVisitas(res.data)
+    try {
+      const res = await axios.get('/visitas/')
+      setVisitas(res.data)
+    } catch (error) {
+      console.error('Erro ao buscar visitas', error)
+    }
   }
 
   const adicionarVisita = async (dados) => {
-    await axios.post('/visitas/', dados)
-    buscarVisitas()
-    return true
+    try {
+      await axios.post('/visitas/', dados)
+      buscarVisitas()
+      Swal.fire('Sucesso!', 'Visita cadastrada com sucesso.', 'success')
+      return true
+    } catch (error) {
+      const mensagemDjango = error.respone?.data
+      ? Json.stringfy(error.response.data)
+      : 'Erro de conexão com o servidor.'
+      Swal.fire('Erro do Servidor', mensagemDjango, 'error')
+      return false
+    }
   }
 
   const atualizarVisita = async (dados) => {
-    await axios.put(`/visitas/${dados.id}/`, dados)
-    buscarVisitas()
+    try {
+      await axios.put(`/visitas/${dados.id}/`, dados)
+      buscarVisitas()
+      Swal.fire('Sucesso', 'Visita atualizada com sucesso.', 'success')
+    } catch (error) {
+      Swal.fire('Erro', 'Não foi possível atualizar a visita.', 'error')
+    }
   }
 
   const deletarVisita = async (id) => {
@@ -157,89 +175,121 @@ function Visitas() {
       showCancelButton: true,
       confirmButtonText: 'Sim, deletar',
       cancelButtonText: 'Cancelar',
+      iconColor: 'red',
       customClass: {
-        confirmButton: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
-        cancelButton: "bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400 ml-2"
+        confirmButton: "bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600",
+        cancelButton: "bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 ml-2"
       },
       buttonsStyling: false
     })
 
     if (confirmacao.isConfirmed) {
-      await axios.delete(`/visitas/${id}/`)
-      Swal.fire('Deletado!', 'Visita removida.', 'success')
-      buscarVisitas()
+      try {
+        await axios.delete(`/visitas/${id}/`)
+        Swal.fire({
+          title: "Deletado!",
+          text: "Visita removida com sucesso.",
+          icon: "success",
+          confirmButtonText: "OK",
+          customClass: {
+            confirmButton: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          },
+          buttonsStyling: false,
+        })
+        buscarVisitas()
+      } catch (error) {
+        Swal.fire('Erro', 'Não foi possível deletar a visita.', 'error')
+      }
     }
   }
 
   const visitasFiltradas = visitas.filter(v =>
-    v.id.toString().includes(busca)
+    (v.visitante_nome && v.visitante_nome.toLowerCase().includes(busca.toLowerCase())) ||
+    (v.empresa_nome && v.empresa_nome.toLowerCase().includes(busca.toLowerCase())) ||
+    (v.numero_os && v.numero_os.includes(busca))
   )
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-100 via-blue-50 to-white py-10 px-4">
       <div className="max-w-6xl mx-auto bg-white shadow-2xl rounded-2xl p-8 space-y-8">
 
-        <div className="flex justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <h2 className="text-3xl font-bold text-blue-700">Visitas</h2>
-          <button onClick={() => setMostrarCadastro(true)} className="bg-blue-600 text-white px-6 py-2 rounded-md">
-            + Nova Visita
+          <button 
+            onClick={() => setMostrarCadastro(true)} 
+            className="bg-blue-600 text-white px-6 py-2 rounded-md text-sm font-semibold hover:bg-blue-700 transition-colors"
+          >
+            + Cadastrar nova visita
           </button>
         </div>
 
-        <input
-          value={busca}
-          onChange={e => setBusca(e.target.value)}
-          placeholder="Buscar..."
-          className="w-full md:w-1/2 px-4 py-2 border rounded"
-        />
+        <div>
+          <input
+            value={busca}
+            onChange={e => setBusca(e.target.value)}
+            placeholder="Buscar por visitante, empresa ou OS..."
+            className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          />
+        </div>
 
-        <table className="w-full">
-          <thead className="bg-blue-100">
-            <tr>
-              <th>ID</th>
-              <th>Visitante</th>
-              <th>Empresa</th>
-              <th>Data</th>
-              <th>Entrada</th>
-              <th>Saída</th>
-              <th>OS</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {visitasFiltradas.map(v => (
-              <tr key={v.id}>
-                <td>{v.id}</td>
-                <td>{v.visitante_nome}</td>
-                <td>{v.empresa_nome}</td>
-                <td>{v.data}</td>
-                <td>{v.hora_entrada}</td>
-                <td>{v.hora_saida}</td>
-                <td>{v.numero_os}</td>
-
-                <td className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      setVisitaSelecionada(v)
-                      setMostrarEdicao(true)
-                    }}
-                    className="bg-yellow-400 px-2 py-1 rounded text-white"
-                  >
-                    Editar
-                  </button>
-
-                  <button
-                    onClick={() => deletarVisita(v.id)}
-                    className="bg-red-500 px-2 py-1 rounded text-white"
-                  >
-                    Deletar
-                  </button>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full table-auto border-collapse">
+            <thead className="bg-blue-100 text-blue-800 text-left text-sm uppercase font-semibold">
+              <tr>
+                <th className="px-4 py-3">ID</th>
+                <th className="px-4 py-3">Visitante</th>
+                <th className="px-4 py-3">Empresa</th>
+                <th className="px-4 py-3">Data</th>
+                <th className="px-4 py-3">Entrada</th>
+                <th className="px-4 py-3">Saída</th>
+                <th className="px-4 py-3">OS</th>
+                <th className="px-4 py-3">Ações</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+
+            <tbody className="text-gray-700 text-sm">
+              {visitasFiltradas.map(v => (
+                <tr key={v.id} className="border-t hover:bg-blue-50 transition">
+                  <td className="px-4 py-3">{v.id}</td>
+                  <td className="px-4 py-3">{v.visitante_nome}</td>
+                  <td className="px-4 py-3">{v.empresa_nome}</td>
+                  <td className="px-4 py-3">{v.data ? v.data.split('-').reverse().join('/') : '-'}</td>
+                  <td className="px-4 py-3">{v.hora_entrada}</td>
+                  <td className="px-4 py-3">{v.hora_saida || '-'}</td>
+                  <td className="px-4 py-3">{v.numero_os || '-'}</td>
+
+                  <td className="px-4 py-3 flex gap-2">
+                    <button
+                      onClick={() => {
+                        setVisitaSelecionada(v)
+                        setMostrarEdicao(true)
+                      }}
+                      className="px-3 py-1 bg-yellow-400 rounded-md text-white hover:bg-yellow-500 transition text-xs font-semibold"
+                      title="Editar visita"
+                    >
+                      Editar
+                    </button>
+
+                    <button
+                      onClick={() => deletarVisita(v.id)}
+                      className="px-3 py-1 bg-red-500 rounded-md text-white hover:bg-red-600 transition text-xs font-semibold"
+                      title="Deletar visita"
+                    >
+                      Deletar
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {visitasFiltradas.length === 0 && (
+                <tr>
+                  <td colSpan="8" className="text-center px-4 py-6 text-gray-500">
+                    Nenhuma visita encontrada.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
       </div>
 
@@ -250,13 +300,24 @@ function Visitas() {
         />
       )}
 
-      {mostrarEdicao && (
+      {mostrarEdicao && visitaSelecionada && (
         <EditarVisitaModal
           visita={visitaSelecionada}
-          onClose={() => setMostrarEdicao(false)}
+          onClose={() => {
+            setMostrarEdicao(false)
+            setVisitaSelecionada(null)
+          }}
           onSalvar={atualizarVisita}
         />
       )}
+    
+      {/* rodapé interno */}
+      <footer className="pb-2 mt-20 text-center text-orange-600 text-sm">
+        <p>© TI - Qmovi Indústria Moveleira LTDA - Gestão de OS - 2026</p>
+          {/* <p className="mt-1 italic text-blue-600 font-extralight" >github.com/arthurluizvieira</p> */}
+      </footer>              
+      {/* final rodape */}    
+    
     </div>
   )
 }

@@ -5,6 +5,8 @@ from django.db import models
 # class OrdemDeServico(models.Model):
 #     from django.db import models
 
+from django.db import models
+
 class OrdemServico(models.Model):
     Numero_OS = models.CharField(max_length=20, unique=True)
     Nome_OS = models.CharField(max_length=50)
@@ -16,11 +18,4 @@ class OrdemServico(models.Model):
     hora_saida = models.TimeField()
 
     def __str__(self):
-        return f"Ordem #{self.Numero_OS} - {self.Profissional_responsavel}"
-
-    
-
-    def __str__(self):
-        return self.Nome
-    
-
+        return f"Ordem #{self.Numero_OS} - {self.Nome_OS}"
