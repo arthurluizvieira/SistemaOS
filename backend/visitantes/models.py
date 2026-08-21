@@ -10,10 +10,13 @@ class Visitante(models.Model):
     telefone = models.CharField(max_length=20, blank=True, null=True)
     entrada = models.DateField(null=True, blank=True) # Dia que a pessoa vem renovar/ quando a pessoa renovou
 
+    # --- IMPLEMENTAÇÃO SOFT DELETE ---
+    is_deleted = models.BooleanField(default=False)
 
-
+    def delete(self, *args, **kwargs):
+        self.is_deleted = True
+        self.save()
+    # ---------------------------------
 
     def __str__(self):
         return self.nome
-    
-

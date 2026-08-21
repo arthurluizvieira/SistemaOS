@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 
 
-# Create your views here.
+# Create your views here.   
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])

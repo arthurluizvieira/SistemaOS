@@ -2,6 +2,8 @@ import { Link } from 'react-router-dom'
 import { UserCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
+
+
 const linkStyle = {
   color: '#ef7d00',
   textDecoration: 'none',
@@ -29,6 +31,7 @@ function Navbar() {
             <Link to="/home/visitas" style={linkStyle}>Visitas</Link>
             <Link to="/home/empresas" style={linkStyle}>Empresas</Link>
             <Link to="/home/ordem_de_servico" style={linkStyle}>OS</Link>
+            <Link to="/home/relatorios" style={linkStyle}>Relatórios</Link>
           </nav>
       
         <center>

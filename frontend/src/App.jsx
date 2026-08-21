@@ -47,6 +47,8 @@ import OrdensServico from './pages/OrdensServico'
 import Navbar from './components/Navbar'
 import PrivateRoute from './components/PrivateRoute'
 
+import RelatorioVisitas from './pages/RelatorioVisitas';
+
 function App() {
   const location = useLocation()
   const hideNavbar = ["/", "/recuperar-senha"].includes(location.pathname)
@@ -83,6 +85,12 @@ function App() {
         <Route path="/home/ordem_de_servico" element={
           <PrivateRoute>
             <OrdensServico />
+          </PrivateRoute>
+        } />
+
+        <Route path="/home/relatorios" element={
+          <PrivateRoute>
+            <RelatorioVisitas />
           </PrivateRoute>
         } />
       </Routes>
